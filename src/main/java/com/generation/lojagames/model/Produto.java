@@ -13,6 +13,9 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 @Entity
@@ -25,7 +28,7 @@ public class Produto {
 
 	@NotBlank(message = "Preencher o nome é obrigatório") // não aceita nulo e espaço vazio
 	// apenas String
-	@Size(min = 5, max = 100, message = "Deve ter no máximo 100 caracteres")
+	@Size(max = 100, message = "Deve ter no máximo 100 caracteres")
 	private String nome;
 
 	@NotBlank(message = "Preencher a descricao é obrigatório")
@@ -38,10 +41,10 @@ public class Produto {
 
 	private String foto;
 
-	@NotEmpty
+	@NotNull
 	private Long quantidade;
 
-	@NotEmpty
+	@NotNull
 	@Digits(integer = 5, fraction = 2)
 	private BigDecimal preco;
 
