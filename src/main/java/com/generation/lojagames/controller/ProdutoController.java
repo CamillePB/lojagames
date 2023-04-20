@@ -1,5 +1,6 @@
 package com.generation.lojagames.controller;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,13 +19,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-
 import com.generation.lojagames.model.Produto;
 import com.generation.lojagames.repository.CategoriaRepository;
 import com.generation.lojagames.repository.ProdutoRepository;
 
 import jakarta.validation.Valid;
-
 
 @RestController
 @RequestMapping("/produtos")
@@ -36,19 +35,19 @@ public class ProdutoController {
 
 	@Autowired
 	private CategoriaRepository categoriaRepository;
-	
+
 	@GetMapping
 	public ResponseEntity<List<Produto>> getAll() {
 		return ResponseEntity.ok(produtoRepository.findAll()); // SELECT * FROM tb_produtos
 	}
-	
+
 	@GetMapping("/{id}") // entre chaves: parametro é uma variavel
 	public ResponseEntity<Produto> getAll(@PathVariable Long id) {
 		return produtoRepository.findById(id) // Selecionar atributos pelo id: SELECT * FROM tb_produtos WHERE id = id;
 
-				.map(resposta -> ResponseEntity.ok(resposta)) 
+				.map(resposta -> ResponseEntity.ok(resposta))
 
-				.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build()); 
+				.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
 	}
 
 	@GetMapping("/nome/{nome}") // entre chaves: parametro é uma variavel
@@ -63,18 +62,19 @@ public class ProdutoController {
 			return ResponseEntity.status(HttpStatus.CREATED)// Resposta para um uso especifico do CORPO da requisição
 					.body(produtoRepository.save(produto));
 		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Categoria não existe", null);
-		// INSERT INTO tb_produtos (nome, descricao, console, foto, quantidade, preco, categoria);
+		// INSERT INTO tb_produtos (nome, descricao, console, foto, quantidade, preco,
+		// categoria);
 	}
 
 	@PutMapping
-	public ResponseEntity<Produto> put(@Valid @RequestBody Produto produto){//Atualizar tabela 
-		//UPTADE tb_produtos SET nome = ?, descricao = ?, console = ?, foto = ?, quantidade = ?, preco = ?, categoria = ? WHERE id = id;
-		
-		if(produtoRepository.existsById(produto.getId())) {
-			if(categoriaRepository.existsById(produto.getCategoria().getId()))
-				return ResponseEntity.status(HttpStatus.OK)
-						.body(produtoRepository.save(produto));
-		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Produto não existe", null);
+	public ResponseEntity<Produto> put(@Valid @RequestBody Produto produto) {// Atualizar tabela
+		// UPTADE tb_produtos SET nome = ?, descricao = ?, console = ?, foto = ?,
+		// quantidade = ?, preco = ?, categoria = ? WHERE id = id;
+
+		if (produtoRepository.existsById(produto.getId())) {
+			if (categoriaRepository.existsById(produto.getCategoria().getId()))
+				return ResponseEntity.status(HttpStatus.OK).body(produtoRepository.save(produto));
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Produto não existe", null);
 		}
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 	}
@@ -90,6 +90,22 @@ public class ProdutoController {
 
 		produtoRepository.deleteById(id);
 		// DELETE * FROM tb_produtos WHERE id = id;
+		
 	}
+		
+	@GetMapping("/preco_maior/{preco}")
+	public ResponseEntity<List<Produto>> getPrecoMaiorQue(@PathVariable BigDecimal preco){ 
+	return ResponseEntity.ok(produtoRepository.findAllByPrecoGreaterThanOrderByPreco(preco));
+	// Consulta pelo preço maior do que o preço digitado emm ordem crescente
+	}
+		
+		
+	@GetMapping("/preco_menor/{preco}")
+	public ResponseEntity<List<Produto>> getPrecoMenorQue(@PathVariable BigDecimal preco){ 
+	return ResponseEntity.ok(produtoRepository.findAllByPrecoLessThanOrderByPrecoDesc(preco));
+	// Consulta pelo preço menor do que o preço digitado em ordem decrescente
+		
+	}
+
 
 }
